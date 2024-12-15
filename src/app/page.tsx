@@ -15,6 +15,7 @@ export default function TODO() {
   const [taskContent, setTaskContent] = useState('')
 
   // read tasks from local storage when component is mounted
+  // コンポーネントがマウントされたときにローカルストレージからタスクを読み込む
   useEffect(() => {
     const storedTasks = localStorage.getItem('tasks')
     if (storedTasks) {
@@ -23,10 +24,12 @@ export default function TODO() {
   }, [])
 
   // when new task was created, update tasks to local storage
+  // 新しいタスクが作成された時に、タスクをローカルストレージに更新する
   useEffect(() => {
     localStorage.setItem('tasks', JSON.stringify(tasks))
   }, [tasks])
 
+  // todo validate needed
   const addTask = () => {
     try {
       const newTask = {
@@ -41,13 +44,19 @@ export default function TODO() {
       console.log(e)
     }
   }
-  // todo implement delete and toggle task state
+
   const deleteTask = (id: string) => {
-    console.log(id)
+    // filter out the selected task by id
+    // 選択されたタスクをIDで外す
+    setTasks(tasks.filter((task) => task.id !== id))
   }
 
   const toggleTaskCompletion = (id: string) => {
-    console.log(id)
+    // if the task's id matches the selected task's id, toggle the completed state.Otherwise, return the task as is
+    // タスクのIDが選択されたタスクのIDと一致する場合、完了状態を切り替えます
+    // それ以外の場合は、タスクをそのまま返します
+    const updatedTasks = tasks.map((task) => (task.id === id ? { ...task, completed: !task.completed } : task))
+    setTasks(updatedTasks)
   }
 
   return (
