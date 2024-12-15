@@ -46,7 +46,7 @@ export default function TodoList() {
                 type="checkbox"
                 checked={task.completed}
                 onChange={() => toggleTaskCompletion(task.id)}
-                className="cursor-pointer"
+                className="w-6 h-6 text-blue-600 bg-gray-100 border-gray-300 rounded-md focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600 cursor-pointer"
               />
             </td>
             <td className="py-2 text-center">{task.title}</td>
