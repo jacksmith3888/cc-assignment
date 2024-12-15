@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react'
 import { TrashIcon } from '@heroicons/react/24/solid'
 import { v4 as uuidv4 } from 'uuid'
-import { set, z } from 'zod'
+import { z } from 'zod'
 
 const taskSchema = z.object({
   id: z.string(),
