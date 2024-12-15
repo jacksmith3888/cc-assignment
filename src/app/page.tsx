@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react'
 import { TrashIcon } from '@heroicons/react/24/solid'
 import { v4 as uuidv4 } from 'uuid'
-import { z } from 'zod'
+import { set, z } from 'zod'
 
 const taskSchema = z.object({
   id: z.string(),
@@ -16,6 +16,7 @@ type Task = z.infer<typeof taskSchema>
 export default function TODO() {
   const [tasks, setTasks] = useState<Task[]>([])
   const [taskContent, setTaskContent] = useState('')
+  const [error, setError] = useState<string>('')
 
   // read tasks from local storage when component is mounted
   // コンポーネントがマウントされたときにローカルストレージからタスクを読み込む
@@ -32,6 +33,10 @@ export default function TODO() {
     localStorage.setItem('tasks', JSON.stringify(tasks))
   }, [tasks])
 
+  const resetError = () => {
+    if (error) setError('')
+  }
+
   const addTask = () => {
     try {
       const newTask = taskSchema.parse({
@@ -42,10 +47,10 @@ export default function TODO() {
       })
       setTasks([...tasks, newTask])
       setTaskContent('')
+      resetError()
     } catch (e) {
-      // todo maybe should try use useActionState to show error message
       if (e instanceof z.ZodError) {
-        alert(e.errors.map((err) => err.message).join(', '))
+        setError(e.errors.map((err) => err.message).join(', '))
       }
     }
   }
@@ -54,6 +59,7 @@ export default function TODO() {
     // filter out the selected task by id
     // 選択されたタスクをIDで外す
     setTasks(tasks.filter((task) => task.id !== id))
+    resetError()
   }
 
   const toggleTaskCompletion = (id: string) => {
@@ -62,6 +68,7 @@ export default function TODO() {
     // それ以外の場合は、タスクをそのまま返します
     const updatedTasks = tasks.map((task) => (task.id === id ? { ...task, completed: !task.completed } : task))
     setTasks(updatedTasks)
+    resetError()
   }
 
   return (
@@ -79,6 +86,7 @@ export default function TODO() {
           追加
         </button>
       </div>
+      <p className="mt-2 text-sm text-red-500 text-center">{error}</p>
       <table className="min-w-full bg-white">
         <thead className="border-b border-gray-900">
           <tr>
