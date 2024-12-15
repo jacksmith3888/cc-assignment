@@ -2,13 +2,16 @@
 import { useState, useEffect } from 'react'
 import { TrashIcon } from '@heroicons/react/24/solid'
 import { v4 as uuidv4 } from 'uuid'
+import { z } from 'zod'
 
-type Task = {
-  id: string
-  title: string
-  completed: boolean
-  createdAt: string
-}
+const taskSchema = z.object({
+  id: z.string(),
+  title: z.string().min(1, '新しいタスクを入力してください'),
+  completed: z.boolean().default(false),
+  createdAt: z.string(),
+})
+
+type Task = z.infer<typeof taskSchema>
 
 export default function TODO() {
   const [tasks, setTasks] = useState<Task[]>([])
@@ -29,19 +32,21 @@ export default function TODO() {
     localStorage.setItem('tasks', JSON.stringify(tasks))
   }, [tasks])
 
-  // todo validate needed
   const addTask = () => {
     try {
-      const newTask = {
+      const newTask = taskSchema.parse({
         id: uuidv4(),
         title: taskContent,
         completed: false,
         createdAt: new Date().toLocaleString(),
-      }
+      })
       setTasks([...tasks, newTask])
       setTaskContent('')
     } catch (e) {
-      console.log(e)
+      // todo maybe should try use useActionState to show error message
+      if (e instanceof z.ZodError) {
+        alert(e.errors.map((err) => err.message).join(', '))
+      }
     }
   }
 
